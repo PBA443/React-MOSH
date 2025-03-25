@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import Input from "./common/input";
+import React from "react";
 import Joi from "joi-browser";
 import Form from "./common/form";
 
