@@ -7,17 +7,17 @@ const NavBar = () => {
         <Link className="navbar-brand" to="/">
           Vidly
         </Link>
-
         <Link className="navbar-brand" to="/movies">
           Movies
         </Link>
-
         <Link className="navbar-brand" to="/customers">
           Customers
         </Link>
-
         <Link className="navbar-brand" to="/rentals">
           Rentals
+        </Link>
+        <Link className="navbar-brand" to="/login">
+          Login
         </Link>
       </ul>
     </nav>
