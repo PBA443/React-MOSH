@@ -25,7 +25,6 @@ function App() {
           <Route path="/movies/:id" element={<MovieForm></MovieForm>}></Route>
           <Route path="/" element={<Movies></Movies>}></Route>
           <Route path="/movies" element={<Navigate to="/"></Navigate>}></Route>
-          <Route path="/movies/new" element={<MovieForm></MovieForm>}></Route>
           <Route path="/rentals" element={<Rentals></Rentals>}></Route>
           <Route path="/customers" element={<Customers></Customers>}></Route>
           <Route path="*" element={<NotFound />} />
