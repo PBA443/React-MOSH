@@ -3,6 +3,8 @@ import Joi from "joi-browser";
 import { getGenres } from "../services/fakeGenreService";
 import Input from "./common/input"; // Assuming Input and Select are your reusable components
 import Select from "./common/select";
+import { useParams, useNavigate } from "react-router-dom";
+import { getMovie, saveMovie } from "../services/fakeMovieService";
 
 const MovieForm = () => {
   const [data, setData] = useState({
@@ -13,6 +15,8 @@ const MovieForm = () => {
   });
   const [genres, setGenres] = useState([]);
   const [errors, setErrors] = useState({});
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const schema = {
     _id: Joi.string(),
@@ -27,10 +31,23 @@ const MovieForm = () => {
   };
 
   useEffect(() => {
-    // Fetch genres on mount
     const fetchedGenres = getGenres();
     setGenres(fetchedGenres);
-  }, []);
+    if (id === "new") return;
+    const movie = getMovie(id);
+    if (!movie) return navigate("/not-found", { replace: true });
+    setData(mapToViewModel(movie));
+  }, [id, navigate]);
+
+  const mapToViewModel = (movie) => {
+    return {
+      _id: movie._id,
+      title: movie.title,
+      genreId: movie.genre._id,
+      numberInStock: movie.numberInStock,
+      dailyRentalRate: movie.dailyRentalRate,
+    };
+  };
 
   const validate = () => {
     const { error } = Joi.validate(data, schema, {
@@ -107,7 +124,8 @@ const MovieForm = () => {
   };
 
   const doSubmit = () => {
-    console.log(data); // Handle form submission
+    saveMovie(data);
+    navigate("/movies");
   };
 
   return (
