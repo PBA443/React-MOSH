@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import NavBar from "./components/navbar.jsx";
 import Movies from "./components/movies.jsx";
 import NotFound from "./components/notFound.jsx";
@@ -8,12 +9,14 @@ import Rentals from "./components/rentals.jsx";
 import MovieForm from "./components/movieForm.jsx";
 import LoginForm from "./components/loginForm.jsx";
 import RegisterForm from "./components/registerForm.jsx";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   // const [count, setCount] = useState(0);
 
   return (
     <>
+      <ToastContainer></ToastContainer>
       <NavBar></NavBar>
       <div className="content">
         <Routes>
