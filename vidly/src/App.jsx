@@ -7,6 +7,7 @@ import Customers from "./components/customers.jsx";
 import Rentals from "./components/rentals.jsx";
 import MovieForm from "./components/movieForm.jsx";
 import LoginForm from "./components/loginForm.jsx";
+import RegisterForm from "./components/registerForm.jsx";
 
 function App() {
   // const [count, setCount] = useState(0);
@@ -17,9 +18,14 @@ function App() {
       <div className="content">
         <Routes>
           <Route path="/login" element={<LoginForm></LoginForm>}></Route>
+          <Route
+            path="/register"
+            element={<RegisterForm></RegisterForm>}
+          ></Route>
           <Route path="/movies/:id" element={<MovieForm></MovieForm>}></Route>
           <Route path="/" element={<Movies></Movies>}></Route>
           <Route path="/movies" element={<Navigate to="/"></Navigate>}></Route>
+          <Route path="/movies/new" element={<MovieForm></MovieForm>}></Route>
           <Route path="/rentals" element={<Rentals></Rentals>}></Route>
           <Route path="/customers" element={<Customers></Customers>}></Route>
           <Route path="*" element={<NotFound />} />

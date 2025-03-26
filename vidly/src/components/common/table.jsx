@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import TableHeader from "./tableHeader";
 import TableBody from "./tableBody";
 

@@ -1,40 +1,44 @@
-import React, { Component } from "react";
+import React from "react";
 
-class TableHeader extends Component {
-  raiseSort = (path) => {
-    const sortColumn = { ...this.props.sortColumn };
-    if (sortColumn.path === path)
-      sortColumn.order = sortColumn.order === "asc" ? "desc" : "asc";
-    else {
-      sortColumn.path = path;
-      sortColumn.order = "asc";
+const TableHeader = ({ columns, sortColumn, onSort }) => {
+  // Function to handle sorting logic
+  const raiseSort = (path) => {
+    const newSortColumn = { ...sortColumn };
+    if (newSortColumn.path === path) {
+      newSortColumn.order = newSortColumn.order === "asc" ? "desc" : "asc";
+    } else {
+      newSortColumn.path = path;
+      newSortColumn.order = "asc";
     }
-    this.props.onSort(sortColumn);
+    onSort(newSortColumn);
   };
 
-  renderSortIcon = (column) => {
-    const { sortColumn } = this.props;
+  // Function to render the sort icon based on the current sort order
+  const renderSortIcon = (column) => {
     if (column.path !== sortColumn.path) return null;
-    if (sortColumn.order === "asc") return <i className="fa fa-sort-asc"></i>;
-    return <i className="fa fa-sort-desc"></i>;
-  };
-  render() {
-    return (
-      <thead>
-        <tr>
-          {this.props.columns.map((column) => (
-            <th
-              key={column.path || column.key}
-              onClick={() => this.raiseSort(column.path)}
-            >
-              {column.label}
-              {this.renderSortIcon(column)}
-            </th>
-          ))}
-        </tr>
-      </thead>
+    return sortColumn.order === "asc" ? (
+      <i className="fa fa-sort-asc"></i>
+    ) : (
+      <i className="fa fa-sort-desc"></i>
     );
-  }
-}
+  };
+
+  return (
+    <thead>
+      <tr>
+        {columns.map((column) => (
+          <th
+            key={column.path || column.key}
+            onClick={() => raiseSort(column.path)}
+            style={{ cursor: "pointer" }} // Optional: Make the column header clickable
+          >
+            {column.label}
+            {renderSortIcon(column)}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+};
 
 export default TableHeader;
