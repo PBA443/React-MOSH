@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { getMovies } from "../services/fakeMovieService";
-import { getGenres } from "../services/fakeGenreService.js";
+import { getMovies, deleteMovie } from "../services/movieService";
+import { getGenres } from "../services/genreService.js";
+import { toast } from "react-toastify";
 import Pagination from "./common/pagination";
 import { paginate } from "../utils/paginate.js";
 import ListGroup from "./common/listGroup.jsx";
@@ -20,13 +21,42 @@ const Movies = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const genres = [{ _id: "", name: "All Genres" }, ...getGenres()];
-    setMovies(getMovies());
-    setGenres(genres);
+    async function fetchGenres() {
+      try {
+        const { data } = await getGenres();
+        const genres = [{ _id: "", name: "All Genres" }, ...data];
+        setGenres(genres);
+      } catch (error) {
+        console.error("Error fetching genres:", error);
+      }
+    }
+
+    async function fetchMovies() {
+      try {
+        const { data: movies } = await getMovies();
+        setMovies(movies);
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      }
+    }
+
+    fetchGenres();
+    fetchMovies();
   }, []);
 
-  const handleDelete = (movie) => {
-    setMovies(movies.filter((m) => m._id !== movie._id));
+  const handleDelete = async (movie) => {
+    const previousMovies = [...movies];
+    try {
+      await deleteMovie(movie._id);
+      setMovies((m) => m.filter((m) => m._id !== movie._id));
+    } catch (error) {
+      setMovies(previousMovies);
+      if (error.response && error.response.status === 404) {
+        toast.error("This movie has already been deleted.");
+      } else {
+        toast.error("An error occurred while deleting the movie.");
+      }
+    }
   };
 
   const handleLike = (movie) => {
@@ -74,7 +104,15 @@ const Movies = () => {
     navigate("/movies/new");
   };
 
-  if (movies.length === 0) return <p>There are no movies in the database.</p>;
+  if (movies.length === 0)
+    return (
+      <>
+        <p>There are no movies in the database.</p>
+        <button onClick={handleSave} className="btn btn-primary mb-3">
+          Add movie
+        </button>
+      </>
+    );
 
   const { totalCount, data: paginatedMovies } = getPageData();
 

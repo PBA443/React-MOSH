@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Joi from "joi-browser";
-import { getGenres } from "../services/fakeGenreService";
+import { getGenres } from "../services/genreService";
 import Input from "./common/input"; // Assuming Input and Select are your reusable components
 import Select from "./common/select";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMovie, saveMovie } from "../services/fakeMovieService";
+import { getMovies, saveMovie } from "../services/movieService";
 
 const MovieForm = () => {
   const [data, setData] = useState({
@@ -31,12 +31,23 @@ const MovieForm = () => {
   };
 
   useEffect(() => {
-    const fetchedGenres = getGenres();
-    setGenres(fetchedGenres);
-    if (id === "new") return;
-    const movie = getMovie(id);
-    if (!movie) return navigate("/not-found", { replace: true });
-    setData(mapToViewModel(movie));
+    async function fetchData() {
+      try {
+        const { data: genresData } = await getGenres();
+        setGenres([...genresData]);
+        if (id === "new") return;
+        const { data: movies } = await getMovies();
+        const movie = movies.find((m) => m._id === id);
+        if (!movie) {
+          navigate("/not-found", { replace: true });
+          return;
+        }
+        setData(mapToViewModel(movie));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    fetchData();
   }, [id, navigate]);
 
   const mapToViewModel = (movie) => {
@@ -123,9 +134,13 @@ const MovieForm = () => {
     );
   };
 
-  const doSubmit = () => {
-    saveMovie(data);
-    navigate("/movies");
+  const doSubmit = async () => {
+    try {
+      await saveMovie(data);
+      navigate("/movies");
+    } catch (error) {
+      console.error("Error saving movie:", error);
+    }
   };
 
   return (
