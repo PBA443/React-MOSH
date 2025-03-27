@@ -18,7 +18,6 @@ const RegisterForm = () => {
   };
 
   const doSubmit = async (data) => {
-    console.log("Submitted", data);
     try {
       await register(data);
     } catch (error) {
