@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Joi from "joi-browser";
 
-const Form = ({ schema, doSubmit, children }) => {
-  const [data, setData] = useState({});
+const Form = ({ schema, doSubmit, children, defaultValues = {} }) => {
+  const [data, setData] = useState(defaultValues);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    setData(defaultValues);
+    setErrors({});
+  }, [defaultValues]);
 
   const validate = () => {
     const { error } = Joi.validate(data, schema, { abortEarly: false });
@@ -14,6 +19,7 @@ const Form = ({ schema, doSubmit, children }) => {
   };
 
   const validateProperty = ({ name, value }) => {
+    if (!schema[name]) return null;
     const obj = { [name]: value };
     const fieldSchema = { [name]: schema[name] };
     const { error } = Joi.validate(obj, fieldSchema);
@@ -25,7 +31,7 @@ const Form = ({ schema, doSubmit, children }) => {
     const errors = validate();
     setErrors(errors || {});
     if (errors) return;
-    doSubmit();
+    doSubmit(data);
   };
 
   const handleChange = ({ target: input }) => {
