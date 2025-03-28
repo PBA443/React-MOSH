@@ -3,7 +3,14 @@ import Like from "./common/like";
 import Table from "./common/table";
 import { Link } from "react-router-dom";
 
-const MoviesTable = ({ movies, onSort, sortColumn, onLike, onDelete }) => {
+const MoviesTable = ({
+  movies,
+  onSort,
+  sortColumn,
+  onLike,
+  onDelete,
+  user,
+}) => {
   const columns = [
     {
       path: "title",
@@ -34,10 +41,12 @@ const MoviesTable = ({ movies, onSort, sortColumn, onLike, onDelete }) => {
       ),
     },
   ];
+  const newColumns = [...columns];
+  newColumns.pop();
 
   return (
     <Table
-      columns={columns}
+      columns={user && user.isAdmin ? columns : newColumns}
       data={movies}
       sortColumn={sortColumn}
       onSort={onSort}
