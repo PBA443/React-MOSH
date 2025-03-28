@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from "react";
 import Joi from "joi-browser";
+import { toast } from "react-toastify";
 
-const Form = ({ schema, doSubmit, children, defaultValues = {} }) => {
+const Form = ({
+  schema,
+  doSubmit,
+  children,
+  defaultValues = {},
+  formError = null,
+  setFormError = null,
+  successMessage = null,
+}) => {
   const [data, setData] = useState(defaultValues);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setData(defaultValues);
     setErrors({});
-  }, [defaultValues]);
+    if (setFormError) setFormError(null);
+  }, [defaultValues, setFormError]);
 
   const validate = () => {
     const { error } = Joi.validate(data, schema, { abortEarly: false });
@@ -26,12 +37,28 @@ const Form = ({ schema, doSubmit, children, defaultValues = {} }) => {
     return error ? error.details[0].message : null;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const errors = validate();
-    setErrors(errors || {});
-    if (errors) return;
-    doSubmit(data);
+    const validationErrors = validate();
+    setErrors(validationErrors || {});
+    if (validationErrors) return;
+
+    setIsSubmitting(true);
+    if (setFormError) setFormError(null);
+
+    try {
+      await doSubmit(data);
+      if (successMessage) {
+        toast.success(successMessage);
+      }
+    } catch (error) {
+      if (setFormError) {
+        setFormError(error.response?.data?.message || "An error occurred");
+        toast.error(error.response?.data?.message || "An error occurred");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = ({ target: input }) => {
@@ -45,12 +72,17 @@ const Form = ({ schema, doSubmit, children, defaultValues = {} }) => {
 
   return (
     <form onSubmit={handleSubmit}>
+      {formError && <div className="alert alert-danger">{formError}</div>}
       {React.Children.map(children, (child) => {
-        return React.cloneElement(child, {
-          onChange: handleChange,
-          value: data[child.props.name] || "",
-          error: errors[child.props.name],
-        });
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child, {
+            onChange: handleChange,
+            value: data[child.props.name] || "",
+            error: errors[child.props.name],
+            disabled: isSubmitting,
+          });
+        }
+        return child;
       })}
     </form>
   );
