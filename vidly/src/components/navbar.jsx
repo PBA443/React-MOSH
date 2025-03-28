@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-const NavBar = () => {
+const NavBar = ({ user }) => {
   return (
     <nav className="navbar navbar-light bg-light">
       <ul>
@@ -16,12 +16,26 @@ const NavBar = () => {
         <Link className="navbar-brand" to="/rentals">
           Rentals
         </Link>
-        <Link className="navbar-brand" to="/login">
-          Login
-        </Link>
-        <Link className="navbar-brand" to="/register">
-          Register
-        </Link>
+        {!user && (
+          <>
+            <Link className="navbar-brand" to="/login">
+              Login
+            </Link>
+            <Link className="navbar-brand" to="/register">
+              Register
+            </Link>
+          </>
+        )}
+        {user && (
+          <>
+            <Link className="navbar-brand" to="/profile">
+              {user.name}
+            </Link>
+            <Link className="navbar-brand" to="/logout">
+              Logout
+            </Link>
+          </>
+        )}
       </ul>
     </nav>
   );
