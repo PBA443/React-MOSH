@@ -3,10 +3,10 @@ import Joi from "joi-browser";
 import Form from "./common/form";
 import Input from "./common/input";
 import { register } from "../services/userService";
+import { loginWithJwt } from "../services/authService";
 
 const RegisterForm = () => {
   const [registrationError, setRegistrationError] = useState(null);
-
   const schema = {
     email: Joi.string().required().email().label("Email"),
     password: Joi.string()
@@ -22,7 +22,9 @@ const RegisterForm = () => {
   const doSubmit = async (data) => {
     try {
       setRegistrationError(null);
-      await register(data);
+      const response = await register(data);
+      loginWithJwt(response.headers["x-auth-token"]);
+      window.location.href = "/";
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setRegistrationError("A user with this email already exists.");
