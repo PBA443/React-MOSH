@@ -10,7 +10,7 @@ import _ from "lodash";
 import { useNavigate } from "react-router-dom";
 import SearchBox from "./searchBox.jsx";
 
-const Movies = () => {
+const Movies = ({ user }) => {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
   const [pageSize] = useState(4);
@@ -127,9 +127,11 @@ const Movies = () => {
           />
         </div>
         <div className="col">
-          <button onClick={handleSave} className="btn btn-primary mb-3">
-            Add movie
-          </button>
+          {user && (
+            <button onClick={handleSave} className="btn btn-primary mb-3">
+              Add movie
+            </button>
+          )}
           <p>Showing {totalCount} movies in the database.</p>
           <SearchBox value={searchQuery} onChange={handleSearch}></SearchBox>
           <MoviesTable
@@ -138,6 +140,7 @@ const Movies = () => {
             onDelete={handleDelete}
             onLike={handleLike}
             onSort={handleSort}
+            user={user}
           />
           <Pagination
             itemsCount={totalCount}
