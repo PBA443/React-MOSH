@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import Joi from "joi-browser";
 import Form from "./common/form";
 import Input from "./common/input";
 import { register } from "../services/userService";
 
 const RegisterForm = () => {
+  const [registrationError, setRegistrationError] = useState(null);
+
   const schema = {
     email: Joi.string().required().email().label("Email"),
     password: Joi.string()
@@ -19,9 +21,15 @@ const RegisterForm = () => {
 
   const doSubmit = async (data) => {
     try {
+      setRegistrationError(null);
       await register(data);
     } catch (error) {
-      console.error("Registration failed", error);
+      if (error.response && error.response.status === 400) {
+        setRegistrationError("A user with this email already exists.");
+      } else {
+        setRegistrationError("Registration failed. Please try again later.");
+        console.error("Registration failed", error);
+      }
     }
   };
 
@@ -31,9 +39,13 @@ const RegisterForm = () => {
       <Form
         schema={schema}
         doSubmit={doSubmit}
+        successMessage={"You are successfully registerd."}
         defaultValues={{ email: "", password: "", name: "" }}
       >
         <Input name="email" label="Email" placeholder="Enter your Email" />
+        {registrationError && (
+          <div className="alert alert-danger">{registrationError}</div>
+        )}
         <Input
           name="password"
           label="Password"
